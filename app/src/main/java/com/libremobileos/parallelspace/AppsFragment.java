@@ -82,7 +82,7 @@ public class AppsFragment extends PreferenceFragmentCompat {
             pref.setTitle(info.getLabel());
             pref.setSummary(info.getPackageName());
             pref.setIcon(info.getIcon());
-            pref.setChecked(info.isAppDuplicated());
+            pref.setChecked(true);
             pref.setEnabled(false);
             pref.setOnPreferenceChangeListener((preference, newValue) -> {
                 info.setDuplicateApp((Boolean) newValue);
