@@ -14,14 +14,16 @@ public class SpaceAppInfo {
     private final ParallelSpaceManager mParallelSpaceManager;
     private final int mUserId;
     private boolean mAppDuplicated;
+    private boolean mToggleable;
 
-    SpaceAppInfo(ResolveInfo info, PackageManager pm, ParallelSpaceManager psm, int userId, boolean isDuplicated) {
+    SpaceAppInfo(ResolveInfo info, PackageManager pm, ParallelSpaceManager psm, int userId, boolean isDuplicated, boolean toggleable) {
         mLabel = info.loadLabel(pm).toString();
         mIcon = info.loadIcon(pm);
         mPackageName = info.activityInfo.packageName;
         mParallelSpaceManager = psm;
         mUserId = userId;
         mAppDuplicated = isDuplicated;
+        mToggleable = toggleable;
     }
 
     String getLabel() {
@@ -35,6 +37,8 @@ public class SpaceAppInfo {
     boolean isAppDuplicated() {
         return mAppDuplicated;
     }
+
+    boolean isAppToggleable() { return mToggleable; }
 
     void setDuplicateApp(boolean duplicate) {
         if (duplicate)

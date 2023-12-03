@@ -1,11 +1,16 @@
 package com.libremobileos.parallelspace;
 
+import static com.android.internal.util.libremobileos.PackageManagerUtils.getApplicationInfo;
+import static com.android.internal.util.libremobileos.PackageManagerUtils.isAppEnabled;
+import static com.android.internal.util.libremobileos.PackageManagerUtils.isAppInstalled;
+
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.widget.Space;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
@@ -63,13 +68,31 @@ class SpaceAppListLiveData extends LiveData<List<SpaceAppInfo>> {
                         break;
                     }
                 }
-                SpaceAppInfo app = new SpaceAppInfo(info, mPackageManager, mParallelSpaceManager, userId, isDuplicated);
+                SpaceAppInfo app = new SpaceAppInfo(info, mPackageManager, mParallelSpaceManager, userId, isDuplicated, true);
                 apps.add(app);
+            }
+            // Add GPlay and Files if app is enabled/ installed
+            if (isAppEnabled(mContext, "com.android.vending")) {
+                apps.add(new SpaceAppInfo(
+                        getResolveInfoFor(mContext, "com.android.vending", "com.google.android.finsky.activities.MainActivity"),
+                        mPackageManager, mParallelSpaceManager, userId, true, false));
+            }
+            if (isAppInstalled(mContext, "com.android.documentsui")) {
+                apps.add(new SpaceAppInfo(
+                        getResolveInfoFor(mContext, "com.android.documentsui", "com.android.documentsui.LauncherActivity"),
+                        mPackageManager, mParallelSpaceManager, userId, true, false));
             }
             if (dataVersion == mCurrentDataVersion) {
                 postValue(apps);
             }
         });
         thread.start();
+    }
+    private ResolveInfo getResolveInfoFor(Context context, String className, String activityName) {
+        Intent intent = new Intent();
+        intent.setClassName(className, activityName);
+        PackageManager packageManager = context.getPackageManager();
+        ResolveInfo resolveInfo = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
+        return resolveInfo;
     }
 }
