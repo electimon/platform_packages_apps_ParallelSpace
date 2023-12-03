@@ -71,8 +71,9 @@ public class AppsFragment extends PreferenceFragmentCompat {
             pref.setOrder(order);
             order++;
         }
-        for (Map.Entry<String, String> app : defaultClonedApps.entrySet()) {
-            ResolveInfo resolveInfo = getResolveInfoFor(getContext(), app.getKey(), app.getValue());
+        List<String> defaultClonedApps = ParallelSpaceManager.getInstance().getDefaultClonedApps();
+        for (String appPackageName : defaultClonedApps) {
+            ResolveInfo resolveInfo = getResolveInfoFor(getContext(), appPackageName);
             SpaceAppInfo info = new SpaceAppInfo(resolveInfo,
                     getContext().getPackageManager(),
                     ParallelSpaceManager.getInstance(),
@@ -94,11 +95,10 @@ public class AppsFragment extends PreferenceFragmentCompat {
         }
     }
 
-    private ResolveInfo getResolveInfoFor(Context context, String className, String activityName) {
-        Intent intent = new Intent();
-        intent.setClassName(className, activityName);
-        PackageManager packageManager = context.getPackageManager();
-        ResolveInfo resolveInfo = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
-        return resolveInfo;
+    private ResolveInfo getResolveInfoFor(Context context, String packageName) {
+        Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        mainIntent.setPackage(packageName);
+        return getContext().getPackageManager().resolveActivity(mainIntent, 0);
     }
 }
